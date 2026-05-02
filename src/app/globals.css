@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+:root {
+  /* Requested Health Green Palette */
+  --background-gradient: linear-gradient(to right, #e8f5e9, #ffffff);
+  --background: #ffffff;
+  --foreground: #1e293b;
+  
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --card-border: #dcedc8;       /* Light Green border */
+  
+  /* Precision Accents - Green Theme */
+  --accent-primary: #2e7d32;    /* Deep Health Green */
+  --accent-hover: #1b5e20;      /* Darker Green for Hover */
+  --accent-success: #43a047;
+  --accent-warning: #f59e0b;
+  
+  --text-secondary: #64748b;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-success: var(--accent-success);
+  --color-accent-warning: var(--accent-warning);
+  --color-text-secondary: var(--text-secondary);
+  
+  --shadow-clinical: 0 4px 20px -2px rgba(46, 125, 50, 0.08);
+}
+
+body {
+  background: var(--background-gradient);
+  background-attachment: fixed;
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Minimalist Card Base */
+.clinical-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-clinical);
+  backdrop-filter: blur(8px);
+}
+
+.clinical-btn {
+  @apply px-6 py-3 bg-accent-primary text-white font-bold rounded-xl 
+         hover:bg-accent-hover active:scale-[0.98] transition-all duration-300 
+         disabled:bg-slate-300 disabled:cursor-not-allowed shadow-lg shadow-accent-primary/20;
+}
+
+.clinical-link {
+  @apply text-accent-primary hover:text-accent-hover font-semibold decoration-2 underline-offset-4 transition-colors;
+}
+
+.bg-health-gradient {
+  background: var(--background-gradient);
+}

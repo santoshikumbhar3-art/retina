@@ -1,0 +1,9 @@
+node_modules/
+.next/
+out/
+backend/full_dataset/
+*.csv
+*.db
+.env
+.vscode/
+*.log
