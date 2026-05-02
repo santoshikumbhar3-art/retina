@@ -2,8 +2,14 @@ node_modules/
 .next/
 out/
 backend/full_dataset/
+backend/train_images/
+backend/venv/
+backend/__pycache__/
 *.csv
 *.db
 .env
 .vscode/
 *.log
+server/uploads/*
+!server/uploads/.gitkeep
+backend/*.pth
