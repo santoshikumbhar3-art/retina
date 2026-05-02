@@ -57,8 +57,7 @@ app.post('/api/analyze', upload.single('file'), async (req, res) => {
         console.log(`STEP 2: Forwarding to Python AI Service at ${AI_SERVICE_URL}...`);
         const aiResponse = await fetch(`${AI_SERVICE_URL}/analyze`, {
             method: 'POST',
-            body: formData,
-            headers: formData.getHeaders()
+            body: formData
         });
 
         console.log("STEP 3: AI response status =", aiResponse.status);
