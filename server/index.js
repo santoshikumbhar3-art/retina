@@ -85,10 +85,16 @@ app.post('/api/analyze', upload.single('file'), async (req, res) => {
         res.json(newRecord);
 
     } catch (error) {
-        console.error("FINAL ERROR:", error);
+        console.error("FINAL ERROR:", error.message);
+        
+        if (error.response) {
+            console.error("AI Service Error:", error.response.data);
+            return res.status(error.response.status).json(error.response.data);
+        }
+
         res.status(500).json({ 
             error: error.message,
-            detail: "Consult backend logs for STEP-by-STEP breakdown"
+            detail: "Could not connect to AI Neural Engine"
         });
     }
 });

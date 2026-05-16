@@ -90,29 +90,61 @@ def overlay_heatmap(heatmap, original_img):
     superimposed_img = cv2.addWeighted(original_img, 0.6, heatmap, 0.4, 0)
     return superimposed_img
 
-# 2. VALIDATION (Lenient but effective for Clinical Scans)
+# 2. VALIDATION (Enhanced for Clinical Integrity)
 def validate_retina_image(image_bytes):
     try:
         img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
         
         # 1. Size Check
         width, height = img.size
-        if width < 100 or height < 100:
-            return False, "Resolution too low for clinical analysis."
+        if width < 200 or height < 200:
+            return False, "Resolution too low for clinical analysis. Min 200x200 required."
 
         # 2. Biological Texture Check (Greyscale standard deviation)
         gray = ImageOps.grayscale(img)
         stats = ImageStat.Stat(gray)
         std_dev = stats.stddev[0]
         
-        # Solid colors or simple graphics have very low std_dev
-        if std_dev < 2:
-             return False, "Image lacks organic biological texture (detected graphic/solid color)."
+        # Fundus images have significant texture due to vessels/macula
+        if std_dev < 15:
+             return False, "Image lacks necessary biological texture/detail (detected graphic or flat image)."
              
-        # 3. Brightness check (Avoid completely black images)
+        # 3. Brightness check (Avoid completely black or white images)
         mean_brightness = stats.mean[0]
-        if mean_brightness < 10:
-            return False, "Image is too dark for analysis."
+        if mean_brightness < 20:
+            return False, "Image is too dark for clinical analysis."
+        if mean_brightness > 230:
+            return False, "Image is overexposed (too bright) for analysis."
+
+        # 4. Color Signature Check (Standard Fundus images are dominated by Red/Orange)
+        r, g, b = img.split()
+        r_mean = ImageStat.Stat(r).mean[0]
+        g_mean = ImageStat.Stat(g).mean[0]
+        b_mean = ImageStat.Stat(b).mean[0]
+        
+        # In a typical fundus scan, Red > Green > Blue
+        if not (r_mean > g_mean and g_mean > b_mean * 0.8):
+            return False, "Image color profile does not match standard retinal fundus characteristics."
+            
+        # 5. Corner Check (Most fundus scans are circular with dark corners)
+        # Check if at least 3 out of 4 corners are relatively dark
+        data = np.array(gray)
+        h, w = data.shape
+        corner_margin = 10
+        corners = [
+            data[0:corner_margin, 0:corner_margin].mean(),
+            data[0:corner_margin, w-corner_margin:w].mean(),
+            data[h-corner_margin:h, 0:corner_margin].mean(),
+            data[h-corner_margin:h, w-corner_margin:w].mean()
+        ]
+        dark_corners = sum(1 for c in corners if c < 50)
+        
+        # We allow some leeway as some images might be cropped
+        if dark_corners < 2:
+             # If corners aren't dark, it might be a zoomed/cropped scan, 
+             # but it must then have very high red dominance to pass
+             if r_mean < g_mean * 1.5:
+                 return False, "Image lacks the typical circular FOV or color signature of a retina scan."
 
         return True, "Valid"
     except Exception as e:
