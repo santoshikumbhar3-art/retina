@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # 1. Database
+  mongodb:
+    image: mongo:6.0
+    container_name: retina_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - retina_network
+
+  # 2. Express Server Backend
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: retina_server
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/retina
+      - PORT=5000
+    depends_on:
+      - mongodb
+    networks:
+      - retina_network
+
+  # 3. Python Core Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: retina_python_backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+    networks:
+      - retina_network
+
+  # 4. Next.js Frontend (Root Directory)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: retina_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:5000
+    depends_on:
+      - server
+    networks:
+      - retina_network
+
+volumes:
+  mongo_data:
+
+networks:
+  retina_network:
+    driver: bridge
