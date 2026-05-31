@@ -23,6 +23,7 @@ services:
     environment:
       - MONGO_URI=mongodb://mongodb:27017/retina
       - PORT=5000
+      - AI_SERVICE_URL=http://backend:8080
     depends_on:
       - mongodb
     networks:
@@ -35,7 +36,7 @@ services:
       dockerfile: Dockerfile
     container_name: retina_python_backend
     ports:
-      - "8000:8000"
+      - "8080:8080"
     depends_on:
       - mongodb
     networks:
