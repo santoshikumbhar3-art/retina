@@ -1,4 +1,5 @@
 const express = require('express');
+const { z } = require('zod');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const multer = require('multer');
@@ -42,6 +43,23 @@ mongoose.connect(MONGO_URI)
 
 // 1. ANALYSIS ROUTE (Proxy to Python AI Service)
 app.post('/api/analyze', upload.single('file'), async (req, res) => {
+    // Define strict validation schema for incoming body fields
+    const analysisSchema = z.object({
+        patientName: z.string({
+            required_error: "Patient name is required",
+        }).min(1, "Patient name cannot be empty"),
+    });
+
+    // Validate req.body against the schema
+    const validationResult = analysisSchema.safeParse(req.body);
+
+    if (!validationResult.success) {
+        // If validation fails, return a clear 400 Bad Request with error messages
+        return res.status(400).json({
+            error: "Validation failed",
+            details: validationResult.error.flatten().fieldErrors
+        });
+    }
     try {
         console.log("STEP 1: Received analysis request");
         if (!req.file) {
@@ -68,7 +86,7 @@ app.post('/api/analyze', upload.single('file'), async (req, res) => {
 
         // Save to MongoDB
         const newRecord = new Analysis({
-            patientName: req.body.patientName || "Anonymous",
+    patientName: validationResult.data.patientName,
             filename: req.file.originalname,
             imagePath: req.file.path,
             diagnosis: result.diagnosis,
