@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 interface AnalysisResult {
@@ -16,14 +16,14 @@ interface AnalysisResult {
 }
 
 export default function ResultPage() {
-  const [result, setResult] = useState<AnalysisResult | null>(null);
-
-  useEffect(() => {
-    const data = sessionStorage.getItem("lastAnalysis");
-    if (data) {
-      setResult(JSON.parse(data));
+  const [result] = useState<AnalysisResult | null>(() => {
+    if (typeof window === "undefined") {
+      return null;
     }
-  }, []);
+
+    const data = sessionStorage.getItem("lastAnalysis");
+    return data ? JSON.parse(data) : null;
+  });
 
   const handleExportPDF = () => {
     if (result?._id) {
@@ -50,15 +50,16 @@ export default function ResultPage() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
            <div className="space-y-2">
               <h1 className="text-4xl font-black text-slate-900 tracking-tight">Clinical Diagnosis</h1>
-              <p className="text-sm font-bold text-slate-400 uppercase tracking-[0.2em]">File: {result.filename} • V4.2</p>
+              <p className="text-sm font-bold text-slate-600 uppercase tracking-[0.2em]">File: {result.filename} - V4.2</p>
            </div>
            <div className="flex gap-4 w-full md:w-auto">
-              <button className="flex-1 md:flex-none px-8 py-3 bg-white text-slate-700 font-bold border-2 border-slate-100 rounded-xl hover:bg-slate-50 transition-all">
+              <button className="flex-1 md:flex-none px-8 py-3 bg-white text-slate-700 font-bold border-2 border-slate-100 rounded-xl hover:bg-slate-50 transition-all" aria-label="Share clinical diagnosis report">
                  Share report
               </button>
               <button 
                 onClick={handleExportPDF}
                 className="flex-1 md:flex-none clinical-btn !py-3 !px-10"
+                aria-label="Export clinical diagnosis report as PDF"
               >
                  Export PDF
               </button>
@@ -100,7 +101,7 @@ export default function ResultPage() {
                           {result.localPreview && (
                             <div className="rounded-2xl border-2 border-slate-100 overflow-hidden shadow-inner bg-slate-50">
                               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 p-3 pb-0">Scan Preview</p>
-                              <img src={result.localPreview} alt="Retina Scan" className="w-full h-32 object-cover" />
+                              <img src={result.localPreview} alt={`Retina scan preview for ${result.filename}`} className="w-full h-32 object-cover" />
                             </div>
                           )}
                        </div>
@@ -132,7 +133,7 @@ export default function ResultPage() {
                                   </div>
                                </div>
                                <p className="text-[10px] text-slate-400 font-medium leading-relaxed italic px-2">
-                                  The highlighted "heat" zones indicate specific areas where the AI detected vascular irregularities or pathological markers.
+                                  The highlighted &quot;heat&quot; zones indicate specific areas where the AI detected vascular irregularities or pathological markers.
                                </p>
                             </div>
                           )}
@@ -162,7 +163,7 @@ export default function ResultPage() {
                                   <div className="p-5 rounded-2xl bg-blue-50/50 border border-blue-100/50 space-y-2">
                                      <h4 className="text-sm font-black text-blue-900 uppercase tracking-wider">Microaneurysms</h4>
                                      <p className="text-sm text-slate-600 font-medium leading-relaxed">
-                                        Small "bubbles" or weak spots in tiny blood vessels. These are early indicators of pressure changes in the retina.
+                                        Small &quot;bubbles&quot; or weak spots in tiny blood vessels. These are early indicators of pressure changes in the retina.
                                      </p>
                                   </div>
                                )}
@@ -171,7 +172,7 @@ export default function ResultPage() {
                                   <div className="p-5 rounded-2xl bg-red-50/50 border border-red-100/50 space-y-2">
                                      <h4 className="text-sm font-black text-red-900 uppercase tracking-wider">Hemorrhages</h4>
                                      <p className="text-sm text-slate-600 font-medium leading-relaxed">
-                                        Tiny leaks where blood has escaped from a vessel. Think of it as a small "drip" from a weak spot.
+                                        Tiny leaks where blood has escaped from a vessel. Think of it as a small &quot;drip&quot; from a weak spot.
                                      </p>
                                   </div>
                                )}
@@ -180,7 +181,7 @@ export default function ResultPage() {
                                   <div className="p-5 rounded-2xl bg-amber-50/50 border border-amber-100/50 space-y-2">
                                      <h4 className="text-sm font-black text-amber-900 uppercase tracking-wider">Exudates</h4>
                                      <p className="text-sm text-slate-600 font-medium leading-relaxed">
-                                        Fatty deposits left behind after fluid leaks and dries up—similar to a "crust" left by a dried spill.
+                                        Fatty deposits left behind after fluid leaks and dries up, similar to a &quot;crust&quot; left by a dried spill.
                                      </p>
                                   </div>
                                )}
@@ -189,7 +190,7 @@ export default function ResultPage() {
                                   <div className="p-5 rounded-2xl bg-emerald-50/50 border border-emerald-100/50 space-y-2">
                                      <h4 className="text-sm font-black text-emerald-900 uppercase tracking-wider">Neovascularization</h4>
                                      <p className="text-sm text-slate-600 font-medium leading-relaxed">
-                                        The growth of fragile, "bad" new blood vessels. This indicates an advanced attempt by the eye to repair damage.
+                                        The growth of fragile, &quot;bad&quot; new blood vessels. This indicates an advanced attempt by the eye to repair damage.
                                      </p>
                                   </div>
                                )}
@@ -206,7 +207,7 @@ export default function ResultPage() {
               <div className="clinical-card p-1">
                  <div className="bg-slate-900 rounded-[12px] p-8 text-white space-y-10">
                     <div className="w-14 h-14 bg-accent-primary/20 rounded-2xl flex items-center justify-center text-accent-primary border border-accent-primary/10 shadow-lg">
-                       <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                       <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
                     <div className="space-y-4">
                        <h3 className="text-2xl font-black tracking-tight">Clinical Recommendations</h3>

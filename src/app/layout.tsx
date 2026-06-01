@@ -20,9 +20,9 @@ export const metadata: Metadata = {
 
 const Navbar = () => {
   return (
-    <nav className="bg-white/80 border-b border-slate-100 sticky top-0 z-50 backdrop-blur-md">
+    <nav className="bg-white/80 border-b border-slate-100 sticky top-0 z-50 backdrop-blur-md" aria-label="Primary navigation">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link href="/" className="flex items-center gap-3 group" aria-label="Healthway Diagnostics home">
           <div className="w-10 h-10 bg-accent-primary rounded-xl flex items-center justify-center transition-transform group-hover:rotate-6 shadow-lg shadow-accent-primary/20">
              <div className="w-5 h-5 border-[3px] border-white rounded-full"></div>
           </div>
@@ -36,7 +36,7 @@ const Navbar = () => {
           </div>
         </Link>
         
-        <div className="flex items-center gap-8 text-sm font-bold text-slate-500 uppercase tracking-widest">
+        <div className="flex items-center gap-8 text-sm font-bold text-slate-700 uppercase tracking-widest">
           <Link href="/" className="hover:text-accent-primary transition-colors">Home</Link>
           <Link href="/history" className="hover:text-accent-primary transition-colors">History</Link>
           <Link href="/technology" className="hover:text-accent-primary transition-colors">Technology</Link>

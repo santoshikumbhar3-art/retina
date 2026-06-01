@@ -35,12 +35,12 @@ const Hero = () => {
           <div className="clinical-card p-4 rotate-2 transition-transform group-hover:rotate-0">
              <div className="bg-white rounded-xl aspect-square flex flex-col items-center justify-center p-12 text-center border border-slate-100">
                 <div className="w-24 h-24 bg-accent-primary/5 rounded-full flex items-center justify-center mb-10 group-hover:scale-110 transition-transform">
-                   <svg className="w-12 h-12 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <svg className="w-12 h-12 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                    </svg>
                 </div>
-                <p className="text-lg font-black uppercase tracking-[0.25em] text-slate-300">Neural Vision v4.0</p>
+                <p className="text-lg font-black uppercase tracking-[0.25em] text-slate-600">Neural Vision v4.0</p>
                 <div className="mt-8 grid grid-cols-4 gap-3 w-full max-w-[240px]">
                    {[...Array(4)].map((_, i) => (
                       <div key={i} className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
@@ -70,7 +70,7 @@ const FeatureSection = () => {
                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
               </div>
               <h3 className="text-2xl font-black text-slate-800 tracking-tight">{item.title}</h3>
-              <p className="text-slate-500 font-medium leading-relaxed">{item.desc}</p>
+              <p className="text-slate-600 font-medium leading-relaxed">{item.desc}</p>
            </div>
          ))}
       </div>
@@ -89,7 +89,7 @@ export default function Home() {
             <h2 className="text-4xl font-black text-slate-900 tracking-tight leading-tight">
                Elevating the standard of ocular screening globally.
             </h2>
-            <p className="text-lg text-slate-500 font-medium leading-relaxed max-w-2xl mx-auto">
+            <p className="text-lg text-slate-600 font-medium leading-relaxed max-w-2xl mx-auto">
                Join hundreds of medical facilities leveraging Healthway for their primary retina diagnostics workflow.
             </p>
             <div className="pt-6">

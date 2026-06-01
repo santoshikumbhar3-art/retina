@@ -104,7 +104,8 @@ export default function HistoryPage() {
                             sessionStorage.setItem("lastAnalysis", JSON.stringify(record));
                             window.location.href = "/result";
                           }}
-                          className="text-[10px] font-black uppercase text-accent-primary hover:text-accent-hover tracking-widest opacity-0 group-hover:opacity-100 transition-all"
+                          className="text-[10px] font-black uppercase text-accent-primary hover:text-accent-hover focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/40 focus-visible:ring-offset-2 tracking-widest opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all"
+                          aria-label={`View report for ${record.filename}`}
                         >
                           View Report
                         </button>

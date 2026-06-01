@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 
@@ -10,13 +10,17 @@ export default function UploadPage() {
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  const setSelectedFile = (selectedFile: File) => {
+    setFile(selectedFile);
+    setPreview(URL.createObjectURL(selectedFile));
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0];
-      setFile(selectedFile);
-      setPreview(URL.createObjectURL(selectedFile));
+      setSelectedFile(e.target.files[0]);
     }
   };
 
@@ -33,9 +37,26 @@ export default function UploadPage() {
     e.preventDefault();
     setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const selectedFile = e.dataTransfer.files[0];
-      setFile(selectedFile);
-      setPreview(URL.createObjectURL(selectedFile));
+      setSelectedFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const openFilePicker = () => {
+    fileInputRef.current?.click();
+  };
+
+  const onDropZoneKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      openFilePicker();
+    }
+  };
+
+  const clearFile = () => {
+    setFile(null);
+    setPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -120,22 +141,29 @@ export default function UploadPage() {
                  />
               </div>
 
-              <div 
+              <div
                 onDragOver={onDragOver}
                 onDragLeave={onDragLeave}
                 onDrop={onDrop}
                 className="relative"
               >
                 <input
+                  ref={fileInputRef}
                   type="file"
                   accept=".jpg,.jpeg,.png,.dicom"
                   onChange={handleFileChange}
-                  className="hidden"
+                  className="sr-only"
                   id="file-upload"
+                  aria-describedby="file-upload-help file-upload-status"
                 />
-                <label
-                  htmlFor="file-upload"
-                  className={`flex flex-col items-center justify-center w-full h-80 border-2 border-dashed rounded-[1rem] cursor-pointer transition-all duration-500 ${
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={openFilePicker}
+                  onKeyDown={onDropZoneKeyDown}
+                  aria-label={file ? `Selected file ${file.name}. Press Enter or Space to choose a different retina scan.` : "Choose or drop a retina scan image"}
+                  aria-describedby="file-upload-help file-upload-status"
+                  className={`flex flex-col items-center justify-center w-full h-80 border-2 border-dashed rounded-[1rem] cursor-pointer transition-all duration-500 focus:outline-none focus-visible:ring-4 focus-visible:ring-accent-primary/30 focus-visible:border-accent-primary ${
                     isDragging 
                       ? 'border-accent-primary bg-accent-primary/5 scale-[1.01]' 
                       : 'border-slate-100 bg-slate-50/50 hover:bg-slate-50 hover:border-accent-primary/30'
@@ -152,7 +180,7 @@ export default function UploadPage() {
                         <p className="text-xl font-black text-slate-800 tracking-tight">
                           {isDragging ? 'Release to upload' : 'Upload Scan imagery'}
                         </p>
-                        <p className="text-xs text-slate-400 font-bold uppercase tracking-[0.2em]">Supported: .DICOM, .JPG, .PNG</p>
+                        <p id="file-upload-help" className="text-xs text-slate-600 font-bold uppercase tracking-[0.2em]">Supported: .DICOM, .JPG, .PNG</p>
                       </div>
                     </div>
                   ) : (
@@ -162,27 +190,37 @@ export default function UploadPage() {
                        </div>
                        <div className="space-y-2">
                           <p className="text-xl font-black text-slate-900 truncate max-w-sm">{file.name}</p>
-                          <button 
-                            type="button" 
-                            onClick={(e) => { e.preventDefault(); setFile(null); }}
-                            className="text-[10px] font-black uppercase text-accent-primary hover:text-accent-hover tracking-[0.2em] transition-colors"
-                          >
-                            Replace File Selection
-                          </button>
+                          <p className="text-[10px] font-black uppercase text-accent-primary tracking-[0.2em]">
+                            Press Enter or Space to replace file
+                          </p>
                        </div>
                     </div>
                   )}
-                </label>
+                </div>
+                <p id="file-upload-status" className="sr-only" aria-live="polite">
+                  {file ? `${file.name} selected for analysis.` : "No retina scan selected."}
+                </p>
+                {file && (
+                  <button
+                    type="button"
+                    onClick={clearFile}
+                    className="mt-4 text-[10px] font-black uppercase text-accent-primary hover:text-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/40 focus-visible:ring-offset-2 tracking-[0.2em] transition-colors"
+                    aria-label={`Remove selected file ${file.name}`}
+                  >
+                    Remove File Selection
+                  </button>
+                )}
               </div>
 
               <button
                 type="submit"
                 disabled={!file || uploading}
                 className="clinical-btn w-full !py-6 text-xl shadow-xl shadow-accent-primary/20"
+                aria-label={uploading ? "Analysis upload in progress" : "Execute retina scan analysis"}
               >
                 {uploading ? (
                   <span className="flex items-center justify-center gap-4">
-                    <svg className="animate-spin h-7 w-7 text-white" viewBox="0 0 24 24">
+                    <svg className="animate-spin h-7 w-7 text-white" viewBox="0 0 24 24" aria-hidden="true">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
@@ -200,7 +238,7 @@ export default function UploadPage() {
         <div className="mt-10 clinical-card p-1 bg-white/50 border-slate-200">
            <div className="bg-white/80 rounded-[12px] p-6 space-y-4">
               <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
-                 <svg className="w-5 h-5 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                 <svg className="w-5 h-5 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-700">Scan Submission Guidelines</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-[11px] leading-relaxed">
